@@ -12,10 +12,6 @@ AppleID.auth.init({
 const app = new Realm.App({
   id: "myapp-zufnj",
 });
-// The redirect URI should be on the same domain as this app and
-// specified in the auth provider configuration.
-const redirectUri = "https://myapp-zufnj.mongodbstitch.com/auth.html";
-const credentials = Realm.Credentials.apple(redirectUri);
 
 const authButton = document.getElementById("apple-auth");
 authButton.addEventListener("click", async (e) => {
@@ -29,7 +25,6 @@ authButton.addEventListener("click", async (e) => {
     const credentials = Realm.Credentials.apple(id_token);
     const user = await app.logIn(credentials);
     console.log(`Logged in with id: ${user.id}`);
-    Realm.handleAuthRedirect();
   } catch (err) {
     console.error("error::", err);
   }
