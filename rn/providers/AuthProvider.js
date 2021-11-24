@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
+import { appleAuthAndroid } from "@invertase/react-native-apple-authentication";
 import Realm from "realm";
 import app from "../realmApp";
 
@@ -85,12 +86,46 @@ const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const logInApple = async () => {
+    const rawNonce = "12345";
+    const state = "let's see...";
+
+    // Configure the request
+    appleAuthAndroid.configure({
+      // The Service ID you registered with Apple
+      clientId: "com.mongodb.testingRealmServicesIdV2",
+
+      // Return URL added to your Apple dev console. We intercept this redirect, but it must still match
+      // the URL you provided to Apple. It can be an empty route on your backend as it's never called.
+      redirectUri: "https://myapp-zufnj.mongodbstitch.com/auth.html",
+
+      // The type of response requested - code, id_token, or both.
+      responseType: appleAuthAndroid.ResponseType.ALL,
+
+      // The amount of user information requested from Apple.
+      scope: appleAuthAndroid.Scope.ALL,
+
+      // Random nonce value that will be SHA256 hashed before sending to Apple.
+      nonce: rawNonce,
+
+      // Unique state value used to prevent CSRF attacks. A UUID will be generated if nothing is provided.
+      state,
+    });
+
+    // Open the browser window for user sign in
+    const response = await appleAuthAndroid.signIn();
+    console.log("response is::", response);
+
+    // Send the authorization code to your backend for verification
+  };
+
   return (
     <AuthContext.Provider
       value={{
         signUp,
         signIn,
         signOut,
+        logInApple,
         user,
         projectData, // list of projects the user is a memberOf
       }}

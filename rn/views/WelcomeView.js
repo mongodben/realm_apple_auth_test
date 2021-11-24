@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Button, Alert } from "react-native";
+import {
+  appleAuthAndroid,
+  AppleButton,
+} from "@invertase/react-native-apple-authentication";
 import { useAuth } from "../providers/AuthProvider";
 import styles from "../stylesheet";
 
 export function WelcomeView({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { user, signUp, signIn } = useAuth();
+  const { user, signUp, signIn, logInApple } = useAuth();
 
   useEffect(() => {
     // If there is a user logged in, go to the Projects page.
@@ -37,9 +41,28 @@ export function WelcomeView({ navigation }) {
     }
   };
 
+  const onPressAppleLogIn = async () => {
+    try {
+      await logInApple();
+    } catch (error) {
+      Alert.alert(`Failed to sign up: ${error.message}`);
+    }
+  };
+
   return (
     <View>
-      <Text>Signup or Signin:</Text>
+      {appleAuthAndroid.isSupported && (
+        <AppleButton
+          buttonStyle={AppleButton.Style.BLACK}
+          buttonType={AppleButton.Type.SIGN_IN}
+          style={{
+            width: 160, // You must specify a width
+            height: 45, // You must specify a height
+          }}
+          onPress={() => onPressAppleLogIn()}
+        />
+      )}
+      <Text>Sign up or Sign in:</Text>
       <View style={styles.inputContainer}>
         <TextInput
           onChangeText={setEmail}
